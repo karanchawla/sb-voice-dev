@@ -8,6 +8,7 @@ from .common import app, app_image
 
 logger = config.get_logger(__name__)
 
+
 @app.function(
     secrets=[Secret.from_name("deepgram-api-key")],
     image=app_image,
@@ -30,6 +31,7 @@ def speech_to_text_service(buffer_data):
         return extract_transcript(stt_response=response.to_json())
     except Exception as e:
         print(f"Exception: {e}")
+
 
 def extract_transcript(stt_response: str) -> str | None:
     try:

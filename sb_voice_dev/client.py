@@ -121,9 +121,7 @@ def record(seconds):
         g_frames.append(data)
 
 
-websocket_url = (
-    f"wss://karanchawla-dev--fastapi-websocket-websocket-handler-dev.modal.run/ws?session_id={session_id}&user_id={user_id}"
-)
+websocket_url = f"wss://karanchawla-dev--fastapi-websocket-websocket-handler-dev.modal.run/ws?session_id={session_id}&user_id={user_id}"
 
 # Object for creating a persistent websocket connection
 audio_queue = queue.Queue()

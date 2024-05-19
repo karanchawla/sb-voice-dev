@@ -1,20 +1,17 @@
-from cgitb import text
-import json
-import os
-
 from fastapi import WebSocket, WebSocketDisconnect
-from modal import Image, asgi_app
+from modal import asgi_app
 
 from . import config
 from .api import WebSocketConnectionManager, web_app
+from .common import app, app_image
 from .conversation_service import llm
 from .deepgram_service import speech_to_text_service
 from .tts import text_to_speech_service
-from .common import app, app_image
 
 logger = config.get_logger(__name__)
 
 manager = WebSocketConnectionManager()
+
 
 @web_app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
@@ -49,6 +46,7 @@ async def websocket_endpoint(websocket: WebSocket):
     except Exception as e:
         logger.error(f"Error occured: {e}")
         await manager.disconnect()
+
 
 @app.function(concurrency_limit=100, allow_concurrent_inputs=1, keep_warm=1, image=app_image)
 @asgi_app()

@@ -1,5 +1,6 @@
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
+
 from . import config
 
 logger = config.get_logger(__name__)
@@ -15,6 +16,7 @@ web_app.add_middleware(
     allow_headers=["*"],
     expose_headers=["*"],
 )
+
 
 class WebSocketConnectionManager:
     def __init__(self) -> None:
