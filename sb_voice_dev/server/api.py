@@ -8,6 +8,7 @@ web_app = FastAPI()
 origins = [
     "https://karanchawla-dev--fastapi-websocket-websocket-handler-dev.modal.run",
 ]
+
 web_app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -16,7 +17,6 @@ web_app.add_middleware(
     allow_headers=["*"],
     expose_headers=["*"],
 )
-
 
 class WebSocketConnectionManager:
     def __init__(self) -> None:

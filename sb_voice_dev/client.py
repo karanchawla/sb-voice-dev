@@ -32,6 +32,8 @@ session_id = "123"
 user_id = "456"
 current_audio_file_path = ""
 
+WEBSOCKET_URI = f"wss://karanchawla-dev--sb-voice-dev-websocket-handler-dev.modal.run/ws?session_id={session_id}&user_id={user_id}"
+audio_queue = queue.Queue()
 
 def set_state(s):
     global state
@@ -120,13 +122,6 @@ def record(seconds):
         data = g_stream.read(CHUNK)
         g_frames.append(data)
 
-
-websocket_url = f"wss://karanchawla-dev--fastapi-websocket-websocket-handler-dev.modal.run/ws?session_id={session_id}&user_id={user_id}"
-
-# Object for creating a persistent websocket connection
-audio_queue = queue.Queue()
-
-
 async def handle_incoming_message(message):
     if isinstance(message, str) and message == "END_OF_AUDIO":
         print("Received end of audio signal")
@@ -160,15 +155,12 @@ async def send_audio(file_path):
             data = audio_file.read()
             await websocket_handler.send_audio(data)
 
-
-# Websocket handling
-websocket_handler = WebSocketHandler(websocket_uri=websocket_url, message_handler=handle_incoming_message)
-
-
 async def process(file_path: str):
     if file_path:
         await send_audio(file_path)
 
+# Websocket handling
+websocket_handler = WebSocketHandler(websocket_uri=WEBSOCKET_URI, message_handler=handle_incoming_message)
 
 async def main():
     listener = keyboard.Listener(on_press=on_press, on_release=on_release, suppress=True)
