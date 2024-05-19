@@ -1,5 +1,6 @@
 import logging
 import yaml
+import os
 from pydantic import BaseModel
 
 
@@ -27,6 +28,7 @@ class ElevenLabsConfiguration(BaseModel):
     model: str
     voice_id: str
 
+# TODO: Pass this configuration object to the Modal app
 class Configuration(BaseModel):
     @classmethod
     def load_config_yaml(cls, config_file_path: str) -> "Configuration":

@@ -32,7 +32,7 @@ session_id = "123"
 user_id = "456"
 current_audio_file_path = ""
 
-WEBSOCKET_URI = f"wss://karanchawla-dev--sb-voice-dev-websocket-handler-dev.modal.run/ws?session_id={session_id}&user_id={user_id}"
+WEBSOCKET_URI = f"wss://karanchawla-dev--sb-voice-dev-websocket-handler-dev.modal.run/v1/speak?session_id={session_id}&user_id={user_id}"
 audio_queue = queue.Queue()
 
 def set_state(s):

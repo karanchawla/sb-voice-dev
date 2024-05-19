@@ -6,7 +6,8 @@ from ...config import LLMConfiguration
 
 logger = logging.getLogger(__name__)
 
-
+# This interface will enable us to test different LLMs via litellm
+# TODO: Create a ConversationService by composing this class
 class LLMService:
     def __init__(self, config: LLMConfiguration):
         self._model = config.model
