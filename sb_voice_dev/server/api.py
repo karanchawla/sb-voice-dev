@@ -1,20 +1,23 @@
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Query
+import asyncio
+
+from fastapi import FastAPI, Query, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 
 from . import config
+from .config import Configuration
 from .services.conversation.llm import llm
 from .services.stt.deepgram_service import speech_to_text_service
 from .services.tts.tts import text_to_speech_service
-import asyncio
-from .config import Configuration
 
 logger = config.get_logger(__name__)
 web_app = FastAPI()
+
 
 def create_server_app(config: Configuration) -> FastAPI:
     # TODO: Create FastAPI app via this method, pass AppState to the object
     # This provides us access to all the services and database we'll need
     pass
+
 
 origins = [
     "https://karanchawla-dev--fastapi-websocket-websocket-handler-dev.modal.run",
@@ -28,6 +31,7 @@ web_app.add_middleware(
     allow_headers=["*"],
     expose_headers=["*"],
 )
+
 
 class WebSocketConnectionManager:
     def __init__(self) -> None:
@@ -59,6 +63,7 @@ class WebSocketConnectionManager:
             print(f"Error receiving data: {e}")
             await self.disconnect(self.websocket)
 
+
 manager = WebSocketConnectionManager()
 
 # TODO: Abstract the STT -> LLM -> TTS into a ConversationInterface so that we aren't micro-managing individual methods
@@ -75,6 +80,7 @@ async def websocket_endpoint(websocket: WebSocket):
     await manager.connect(websocket, session_id, user_id)
     await process_websocket_data(websocket)
 
+
 # TODO: Create APIs for handling conversations
 # TODO: Move routes into individual files via APIRouter()
 # Stubbed out versions below
@@ -86,29 +92,30 @@ def read_conversations(
     pass
     # Read previous conversations from db
 
+
 @web_app.get("/v1/conversations/{conversation_id}")
 def read_conversation(
-    conversation_id: int, 
+    conversation_id: int,
 ):
     pass
     # Read specific conversation from db
 
+
 @web_app.delete("/v1/conversations/{conversation_id}")
-def delete_conversation_endpoint(
-    conversation_id: int
-):
+def delete_conversation_endpoint(conversation_id: int):
     pass
     # Delete conversations from DB
 
+
 @web_app.post("/v1/conversations/{conversation_id}/end")
-async def end_conversation(
-    conversation_id: int
-):
+async def end_conversation(conversation_id: int):
     # End a conversation
     # Requires interaction with AppState
     pass
 
+
 # ================ utils ==============================
+
 
 async def process_websocket_data(websocket: WebSocket):
     try:
@@ -126,6 +133,7 @@ async def process_websocket_data(websocket: WebSocket):
         logger.error(f"Error occurred: {e}")
         await manager.disconnect()
 
+
 async def process_audio_data(data, websocket):
     try:
         audio_transcript = speech_to_text_service.remote(data)
@@ -137,6 +145,7 @@ async def process_audio_data(data, websocket):
         logger.info("Audio processing was cancelled")
     except Exception as e:
         logger.error(f"Error processing audio data: {e}")
+
 
 async def stream_audio_to_client(response, websocket):
     try:

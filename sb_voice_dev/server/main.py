@@ -14,10 +14,7 @@ logger = config.get_logger(__name__)
 # Right now we launch a separate server for each user, but once we have conversation_uuid, we'll be able to handle
 # multiple users (number TBD) via the same socket.
 # This keeps things simple and scales, but might not be the most cost-effective solution
-@app.function(concurrency_limit=100, 
-              allow_concurrent_inputs=1, 
-              keep_warm=1, 
-              image=app_image)
+@app.function(concurrency_limit=100, allow_concurrent_inputs=1, keep_warm=1, image=app_image)
 @asgi_app()
 def web():
     from .api import web_app

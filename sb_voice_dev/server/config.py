@@ -1,6 +1,7 @@
 import logging
-import yaml
 import os
+
+import yaml
 from pydantic import BaseModel
 
 
@@ -11,6 +12,7 @@ def get_logger(name, level=logging.INFO):
     logger.addHandler(handler)
     logger.setLevel(level)
     return logger
+
 
 class LLMConfiguration(BaseModel):
     model: str
@@ -27,6 +29,7 @@ class ElevenLabsConfiguration(BaseModel):
     api_key: str
     model: str
     voice_id: str
+
 
 # TODO: Pass this configuration object to the Modal app
 class Configuration(BaseModel):

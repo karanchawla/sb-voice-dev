@@ -35,6 +35,7 @@ current_audio_file_path = ""
 WEBSOCKET_URI = f"wss://karanchawla-dev--sb-voice-dev-web.modal.run/v1/speak?session_id={session_id}&user_id={user_id}"
 audio_queue = queue.Queue()
 
+
 def set_state(s):
     global state
     state = s
@@ -122,6 +123,7 @@ def record(seconds):
         data = g_stream.read(CHUNK)
         g_frames.append(data)
 
+
 async def handle_incoming_message(message):
     if isinstance(message, str) and message == "END_OF_AUDIO":
         print("Received end of audio signal")
@@ -156,12 +158,15 @@ async def send_audio(file_path):
             data = audio_file.read()
             await websocket_handler.send_audio(data)
 
+
 async def process(file_path: str):
     if file_path:
         await send_audio(file_path)
 
+
 # Websocket handling
 websocket_handler = WebSocketHandler(websocket_uri=WEBSOCKET_URI, message_handler=handle_incoming_message)
+
 
 async def main():
     listener = keyboard.Listener(on_press=on_press, on_release=on_release, suppress=True)

@@ -1,8 +1,10 @@
 # app_state.py
 # Manages server application state
 
-from __future__ import annotations 
+from __future__ import annotations
+
 from dataclasses import dataclass, field
+from queue import Queue
 
 from fastapi import FastAPI
 from h11 import Request
@@ -10,7 +12,7 @@ from h11 import Request
 from .config import Configuration
 from .services.conversation.conversation_service import ConversationService
 from .services.llm.llm_service import LLMService
-from queue import Queue
+
 
 # TODO: To be completed
 @dataclass
