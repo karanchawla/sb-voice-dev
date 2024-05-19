@@ -5,9 +5,10 @@
 
 ## To do
 
-1. Create a websocket connection manager for the client
-2. Set up a websocket connection with a FastAPI server
-3. Read audio file on the server, run the STT -> LLM -> TTS
-4. Figure out what APIs to use for STT, LLM, and TTS services
-5. Stream audio chunks from the server back to the client 
-6. Play received audio back to the user 
+~ - Create a websocket connection manager for the client~
+~ - Set up a simple dir structure ~
+- Set up a websocket connection with a FastAPI server
+- Read audio file on the server, run the STT -> LLM -> TTS
+- Figure out what APIs to use for STT, LLM, and TTS services
+- Stream audio chunks from the server back to the client 
+- Play received audio back to the user 
