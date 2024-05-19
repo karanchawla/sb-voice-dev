@@ -43,6 +43,8 @@ class WebSocketHandler:
                 print(f"Failed to connect after 5 attempts.")
 
     async def send_audio(self, audio_data: bytes):
+        # If we forget to call this before calling send_audio
+        await self.connect()
         if self.websocket:
             try:
                 await self.websocket.send(audio_data)
