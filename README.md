@@ -42,6 +42,25 @@ sb_voice_dev/
     └── Manages WebSocket connections, including sending and receiving messages, and handling connection lifecycle events.
 ```
 
+## Running the repo
+
+### Prerequisites
+
+- Install `poetry` 
+```shell
+curl -sSL https://install.python-poetry.org | python3 -
+```
+
+- Install project dependencies and switch to poetry virtual environment
+```shell
+make install
+```
+
+- Start the client
+```python
+python sb_voice_dev/client.py
+```
+You should see the client connect to the remote server with `WebSocket connected` displayed on your terminal. Once the connection is established, press and hold `Spacebar` key to record your prompt and then wait for response from the server. Press `q` to quit the application.
 
 ## To do
 

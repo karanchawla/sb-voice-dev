@@ -18,10 +18,6 @@ check: ## Check code formatting using isort, black, flake8 and mypy.
 	@echo "🚀 Checking code formatting: Running mypy"
 	@mypy .
 
-test: ## Test the code with pytest
-	@echo "🚀 Testing code: Running pytest"
-	@pytest --doctest-modules
-
 build: clean-build ## Build wheel file using poetry
 	@echo "🚀 Creating wheel file"
 	@poetry build
