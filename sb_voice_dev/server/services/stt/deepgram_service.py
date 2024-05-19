@@ -3,8 +3,8 @@ import os
 
 from modal import Secret
 
-from . import config
-from .common import app, app_image
+from ... import config
+from ...common import app, app_image
 
 logger = config.get_logger(__name__)
 

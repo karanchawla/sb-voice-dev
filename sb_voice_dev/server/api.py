@@ -2,9 +2,9 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Query
 from fastapi.middleware.cors import CORSMiddleware
 
 from . import config
-from .llm import llm
-from .deepgram_service import speech_to_text_service
-from .tts import text_to_speech_service
+from .services.conversation.llm import llm
+from .services.stt.deepgram_service import speech_to_text_service
+from .services.tts.tts import text_to_speech_service
 import asyncio
 
 logger = config.get_logger(__name__)
