@@ -5,10 +5,8 @@
 
 ## To do
 
-~~ - Create a websocket connection manager for the client ~~
-~~ - Set up a simple dir structure ~~
-- Set up a websocket connection with a FastAPI server
-- Read audio file on the server, run the STT -> LLM -> TTS
-- Figure out what APIs to use for STT, LLM, and TTS services
-- Stream audio chunks from the server back to the client 
-- Play received audio back to the user 
+- Figure out project structure with Modal such that we can break out stt, llm, tts into separate services
+- Need to figure out how to inject app configuration to modal?
+- Strategy for warm containers? Client side magic? 
+- App state?
+- Connect to persistent database?
