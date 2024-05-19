@@ -17,6 +17,7 @@ pyaudio = "^0.2.14"
 playsound = {path = "playsound-1.3.0-py3-none-any.whl"}
 pydub = "^0.25.1"
 websockets = "^12.0"
+modal = "^0.62.175"
 
 
 [tool.poetry.dev-dependencies]
