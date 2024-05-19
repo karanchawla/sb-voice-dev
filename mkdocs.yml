@@ -1,0 +1,30 @@
+site_name: sb-voice-dev
+repo_url: https://github.com/karanchawla/sb-voice-dev
+site_url: ""
+site_description: Stands up a server for voice-to-voice commmunication
+site_author: Karan Chawla
+use_directory_urls: false
+
+nav:
+  - Home: index.md
+  - Modules: modules.md
+plugins:
+  - mkdocstrings:
+      handlers:
+        python:
+            setup_commands:
+                - import sys
+                - sys.path.append('../')
+copyright: Maintained by Karan Chawla.
+theme:
+  name: material
+  feature:
+    tabs: true
+  palette:
+    primary: white
+    accent: blue
+markdown_extensions:
+  - toc:
+      permalink: true
+  - pymdownx.arithmatex:
+      generic: true

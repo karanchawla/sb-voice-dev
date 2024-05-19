@@ -5,8 +5,8 @@
 
 ## To do
 
-~ - Create a websocket connection manager for the client~
-~ - Set up a simple dir structure ~
+~~ - Create a websocket connection manager for the client ~~
+~~ - Set up a simple dir structure ~~
 - Set up a websocket connection with a FastAPI server
 - Read audio file on the server, run the STT -> LLM -> TTS
 - Figure out what APIs to use for STT, LLM, and TTS services
