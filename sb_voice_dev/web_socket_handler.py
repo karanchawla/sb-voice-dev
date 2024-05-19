@@ -1,19 +1,21 @@
 # web_socket_handler.py
-# This module defines an interface for managing the websocket connection with the remote server. 
+# This module defines an interface for managing the websocket connection with the remote server.
 # It accepts the websocket_uri and a message handler that will be invoked when data is received from the server.
-# TODO: This class can probably be refactored to be more generic, I'll come back to it if I have time. 
+# TODO: This class can probably be refactored to be more generic, I'll come back to it if I have time.
 
 import asyncio
-import websockets
-from typing import Callable, Union, Awaitable
+from typing import Awaitable, Callable, Union
 
-class WebSocketHandler: 
+import websockets
+
+
+class WebSocketHandler:
     def __init__(self, websocket_uri: str, message_handler: Callable[[Union[str, bytes]], Awaitable[None]]) -> None:
         self.websocket_uri = websocket_uri
         self.websocket = None
         self.connection_lock = asyncio.Lock()
         self.is_active = False
-        
+
         # Handler for incoming messages
         self.message_handler = message_handler
 
@@ -22,20 +24,20 @@ class WebSocketHandler:
             retry_count = 0
             # TODO: This retry count should probably be reconfigurable
             while retry_count < 5 and (not self.websocket or self.websocket.closed):
-                # ensure websocket is properly closed and reset before attempting to reconnect 
+                # ensure websocket is properly closed and reset before attempting to reconnect
                 if self.websocket:
                     await self.websocket.close()
-                
+
                 try:
                     self.websocket = await websockets.connect(uri=self.websocket_uri)
                     self.is_active = True
                     print("WebSocket connected.")
                     asyncio.create_task(self.receive_data())
-                    break # exit the loop on successful connnection
+                    break  # exit the loop on successful connnection
                 except Exception as e:
                     retry_count += 1
                     # exponential backoff before attemting to reconnect
-                    wait_time = min(30, 2 ** retry_count)
+                    wait_time = min(30, 2**retry_count)
                     print(f"Failed to connect to the WebSocket: {e}, retrying in {wait_time} seconds...")
                     await asyncio.sleep(wait_time)
 
@@ -52,7 +54,7 @@ class WebSocketHandler:
             except Exception as e:
                 print(f"Error sending audio data: {e}")
                 await self.websocket.close()
-    
+
     async def receive_data(self):
         try:
             while self.is_active:
