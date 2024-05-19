@@ -131,7 +131,8 @@ async def handle_incoming_message(message):
 
 
 def audio_player(stop_event):
-    # This is not the best implementation, rethink this if I have time
+    # TODO: This is not the best implementation, rethink this if I have time
+    # Perhaps move to wav because we can play individual chunks?
     while not stop_event.is_set():
         audio_stream = BytesIO()
         while not stop_event.is_set():
