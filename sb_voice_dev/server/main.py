@@ -19,7 +19,7 @@ logger = config.get_logger(__name__)
               keep_warm=1, 
               image=app_image)
 @asgi_app()
-def websocket_handler():
+def web():
     from .api import web_app
 
     return web_app

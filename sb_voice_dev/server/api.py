@@ -6,9 +6,16 @@ from .services.conversation.llm import llm
 from .services.stt.deepgram_service import speech_to_text_service
 from .services.tts.tts import text_to_speech_service
 import asyncio
+from .config import Configuration
 
 logger = config.get_logger(__name__)
 web_app = FastAPI()
+
+def create_server_app(config: Configuration) -> FastAPI:
+    # TODO: Create FastAPI app via this method, pass AppState to the object
+    # This provides us access to all the services and database we'll need
+    pass
+
 origins = [
     "https://karanchawla-dev--fastapi-websocket-websocket-handler-dev.modal.run",
 ]
