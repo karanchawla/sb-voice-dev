@@ -1,10 +1,11 @@
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Query
 from fastapi.middleware.cors import CORSMiddleware
 
 from . import config
-from .conversation_service import llm
+from .llm import llm
 from .deepgram_service import speech_to_text_service
 from .tts import text_to_speech_service
+import asyncio
 
 logger = config.get_logger(__name__)
 web_app = FastAPI()
@@ -26,6 +27,7 @@ class WebSocketConnectionManager:
         self.websocket: WebSocket = None
         self.session_id: str = None
         self.user_id: str = None
+        self.current_task: asyncio.Task = None
 
     async def connect(self, websocket: WebSocket, session_id: str, user_id: str):
         await websocket.accept()
@@ -52,7 +54,6 @@ class WebSocketConnectionManager:
 
 manager = WebSocketConnectionManager()
 
-# TODO: Add pre-emption to this pipeline
 # TODO: Abstract the STT -> LLM -> TTS into a ConversationInterface so that we aren't micro-managing individual methods
 @web_app.websocket("/v1/speak")
 async def websocket_endpoint(websocket: WebSocket):
@@ -67,14 +68,50 @@ async def websocket_endpoint(websocket: WebSocket):
     await manager.connect(websocket, session_id, user_id)
     await process_websocket_data(websocket)
 
+# TODO: Create APIs for handling conversations
+# TODO: Move routes into individual files via APIRouter()
+# Stubbed out versions below
+@web_app.get("/v1/conversations/")
+def read_conversations(
+    offset: int = 0,
+    limit: int = Query(default=100),
+):
+    pass
+    # Read previous conversations from db
+
+@web_app.get("/v1/conversations/{conversation_id}")
+def read_conversation(
+    conversation_id: int, 
+):
+    pass
+    # Read specific conversation from db
+
+@web_app.delete("/v1/conversations/{conversation_id}")
+def delete_conversation_endpoint(
+    conversation_id: int
+):
+    pass
+    # Delete conversations from DB
+
+@web_app.post("/v1/conversations/{conversation_id}/end")
+async def end_conversation(
+    conversation_id: int
+):
+    # End a conversation
+    # Requires interaction with AppState
+    pass
 
 # ================ utils ==============================
 
 async def process_websocket_data(websocket: WebSocket):
     try:
         while True:
+            # TODO: Generate a new token for each audio file received and add to db
             data = await manager.receive_data()
-            await process_audio_data(data, websocket)
+            if manager.current_task and not manager.current_task.done():
+                manager.current_task.cancel()
+                logger.info("Cancelled the ongoing audio processing task.")
+            manager.current_task = asyncio.create_task(process_audio_data(data, websocket))
     except WebSocketDisconnect as e:
         logger.error(f"WebSocket disconnected: {e}")
         await manager.disconnect()
@@ -89,6 +126,8 @@ async def process_audio_data(data, websocket):
             response = llm.remote(audio_transcript)
             logger.debug("Received response from the LLM.")
             await stream_audio_to_client(response, websocket)
+    except asyncio.CancelledError:
+        logger.info("Audio processing was cancelled")
     except Exception as e:
         logger.error(f"Error processing audio data: {e}")
 
