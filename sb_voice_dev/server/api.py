@@ -149,8 +149,11 @@ async def process_audio_data(data, websocket):
 
 async def stream_audio_to_client(response, websocket):
     try:
-        for chunk in text_to_speech_service.remote_gen(response):
-            await websocket.send_bytes(chunk)
+        async for chunk in text_to_speech_service.remote_gen.aio(response):
+            if chunk == "END_OF_AUDIO":
+                await websocket.send_text("END_OF_AUDIO")
+                break
+            await websocket.send_bytes(chunk['audio'])
         await websocket.send_text("END_OF_AUDIO")
     except Exception as e:
         logger.error(f"Error streaming audio to client: {e}")

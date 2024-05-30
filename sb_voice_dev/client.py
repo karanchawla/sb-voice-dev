@@ -9,6 +9,9 @@ from playsound import playsound
 from pydub import AudioSegment
 from pydub.playback import play
 from pynput import keyboard
+import numpy as np
+import sounddevice as sd
+import time
 
 from sb_voice_dev.web_socket_handler import WebSocketHandler
 
@@ -35,6 +38,8 @@ current_audio_file_path = ""
 WEBSOCKET_URI = f"wss://karanchawla-dev--sb-voice-dev-web.modal.run/v1/speak?session_id={session_id}&user_id={user_id}"
 audio_queue = queue.Queue()
 
+# Measuring latency
+start_time = None
 
 def set_state(s):
     global state
@@ -126,38 +131,46 @@ def record(seconds):
 
 async def handle_incoming_message(message):
     if isinstance(message, str) and message == "END_OF_AUDIO":
-        print("Received end of audio signal")
-        audio_queue.put(None)  # Signal the end of audio
+        audio_queue.put("END_OF_AUDIO")  # Signal the end of audio
     elif isinstance(message, bytes):
         audio_queue.put(message)
 
 
 def audio_player(stop_event):
-    # TODO: This is not the best implementation, rethink this if I have time
-    # Perhaps move to wav because we can play individual chunks?
+    buffer_size = 6
+    buffer = []
     while not stop_event.is_set():
-        audio_stream = BytesIO()
-        while not stop_event.is_set():
+        try:
             chunk = audio_queue.get()
-            if chunk is None:
-                break
-            elif isinstance(chunk, bytes):
-                audio_stream.write(chunk)
+        except queue.Empty:
+            continue
 
-        audio_stream.seek(0)
-        audio_stream.seek(0)
-        if audio_stream.getbuffer().nbytes > 0:  # Check if there's anything to play
-            audio_segment = AudioSegment.from_file(audio_stream, format="mp3")
-            play(audio_segment)
-        audio_stream.close()
+        if chunk == "END_OF_AUDIO":
+            if buffer:
+                play_buffer(buffer)
+                buffer = []
+            continue
+        elif isinstance(chunk, bytes):
+            buffer.append(chunk)
+            if len(buffer) >= buffer_size or audio_queue.empty():
+                play_buffer(buffer)
+                buffer = []
 
+    if buffer:
+        play_buffer(buffer)
+
+def play_buffer(buffer):
+    audio_data = np.concatenate([np.frombuffer(chunk, dtype=np.float32) for chunk in buffer])
+    sd.play(audio_data, samplerate=16000)
+    sd.wait()
 
 async def send_audio(file_path):
     if websocket_handler.is_active:
         with open(file_path, "rb") as audio_file:
             data = audio_file.read()
             await websocket_handler.send_audio(data)
-
+    global start_time
+    start_time = time.time()
 
 async def process(file_path: str):
     if file_path:
@@ -190,8 +203,7 @@ async def main():
                     set_state("wait")
                 else:
                     set_state("wait")
-            else:
-                await asyncio.sleep(0.1)
+            await asyncio.sleep(0.1)
     finally:
         await websocket_handler.close()
         listener.stop()

@@ -7,35 +7,29 @@ logger = config.get_logger(__name__)
 
 
 @app.function(
-    secrets=[Secret.from_name("eleven-labs-api-key")],
+    secrets=[Secret.from_name("cartesia-api-key")],
     image=app_image,
     keep_warm=1,
     container_idle_timeout=300,
     concurrency_limit=1,
     is_generator=True,
 )
-def text_to_speech_service(llm_response: str):
+async def text_to_speech_service(llm_response: str):
     import os
+    import asyncio
+    from cartesia.tts import CartesiaTTS
 
-    from elevenlabs import VoiceSettings
-    from elevenlabs.client import ElevenLabs
+    voice = 'Classy British Man'
+    gen_cfg = dict(model_id="upbeat-moon", data_rtype='bytes', output_format='fp32_16000')
 
-    ELEVENLABS_API_KEY = os.getenv("ELEVEN_LABS_API_KEY")
-    client = ElevenLabs(
-        api_key=ELEVENLABS_API_KEY,
-    )
-    response = client.text_to_speech.convert(
-        voice_id="IKne3meq5aSn9XLyUdCD",
-        optimize_streaming_latency="3",
-        output_format="mp3_22050_32",
-        text=llm_response,
-        model_id="eleven_turbo_v2",
-        voice_settings=VoiceSettings(
-            stability=0.0,
-            similarity_boost=1.0,
-            style=0.0,
-            use_speaker_boost=True,
-        ),
-    )
+    # create client
+    client = CartesiaTTS(api_key=os.environ["CARTERSIA_API_KEY"])
+    voice = client.get_voice_embedding(voice_id="95856005-0332-41b0-935f-352e296aa0df")
 
-    return response
+    # generate audio
+    output_generator = client.generate(transcript=llm_response, voice=voice, stream=True, **gen_cfg)
+    try:
+        for chunk in output_generator:
+            yield chunk
+    finally:
+        yield "END_OF_AUDIO"
